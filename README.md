@@ -1,38 +1,89 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# BunkerCMS
 
-## Getting Started
+BunkerCMS is a headless Content Management System (CMS) built with Next.js, using Next.js app router and MongoDB. It's designed to be deployed for free on Vercel, offering a customizable and free solution for managing content.
 
-First, run the development server:
+## Motivation
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+I sought a cost-effective, customizable headless CMS with a beautiful text editor, capable of integrating with a serverless MongoDB database and deployable on Vercel's hobby plan.
+
+Strapi was my usual go-to for CMS needs but they discontinued MongoDB support a while ago and sometimes it has more functionality and complexity than I actually need.
+
+BunkerCMS is perfect for basic CMS needs like blog content management and is enhanced by a sophisticated and user-friendly rich text editor developed using Tiptap.
+
+## Demo
+
+Access the live demo here: [BunkerCMS Demo](https://bunker-cms-demo.vercel.app/)
+
+-   **Email**: demo@bunker-cms.com
+-   **Password**: zdNx3TANq1SB
+-   **Public API Key** (for API requests): `df418e1d-a698-46ae-9255-80e5848c4054`
+
+## Tech Stack
+
+BunkerCMS leverages the following technologies:
+
+-   **Language**: TypeScript
+-   **Framework**: Next.js app router
+-   **Database**: MongoDB
+-   **Tables**: @tanstack/react-table
+-   **Forms**: react-hook-form
+-   **Styling**: SCSS Modules
+-   **Text Editor**: Tiptap
+-   **Authentication**: next-auth
+
+## Quick Start Guide
+
+```
+npm install            # Install dependencies
+touch .env.local       # Create a local environment file
+npm run dev            # Start the development server
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Setting Up Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file at the root of your project and populate it with the following variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+-   NEXTAUTH_SECRET=
+-   CLOUDINARY_NAME=
+-   CLOUDINARY_KEY=
+-   CLOUDINARY_SECRET=
+-   CLOUDINARY_FOLDER=
+-   PUBLIC_API_KEY=
+-   MONGODB_URI=
 
-## Learn More
+### Create an account
 
-To learn more about Next.js, take a look at the following resources:
+1. Create an account at http://localhost:3000/sign-up
+2. You will be directed to BunkerCMS dashboard where you can edit your content
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### External API requests
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+To make an external API request to Bunker CMS
 
-## Deploy on Vercel
+```
+import qs from 'qs';
+import { url } from '@/config'; // url will be http://localhost:3000 or your production deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-# bunkercms
-# bunker-cms
+const query = qs.stringify(
+    {
+        select: 'slug description title tags image updatedAt createdAt',
+        pageIndex: 0,
+        pageSize: 1,
+        sort: {
+            createdAt: -1,
+        },
+    },
+    {
+        encodeValuesOnly: true, // prettify URL
+    }
+);
+const res = await fetch(url + '/api/api-blogs?' + query, {
+    method: 'GET',
+    next: { revalidate: 3600 }, // refresh every 60 minutes
+    headers: {
+        'Content-Type': 'application/json',
+        authorization: // this needs to be the same as PUBLIC_API_KEY
+    },
+})
+const { data: blogs } = await res.json();
+```
