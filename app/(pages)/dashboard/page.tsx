@@ -14,16 +14,7 @@ export default function Page({}) {
                     <h1>Dashboard home</h1>
                     <p>Manage your content</p>
                 </div>
-                <div className={'actions'}>
-                    <Link
-                        href={'/dashboard/content-manager/tag/create'}
-                        className="button small"
-                    >
-                        Create new entry
-                    </Link>
-                </div>
             </StickyHeader>
-
             <div className={styles['collections-boxes']}>
                 {collection_models.map((model, i) => {
                     return (
